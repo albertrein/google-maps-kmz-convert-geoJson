@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./toGeoJson.js"></script>
+    <script src="jszip.js"></script>
+    
+
+</head>
+<body>
+    <iframe src="https://www.google.com/maps/d/embed?mid=13MJM3S--LI07zUN80IrCad1OY5PTMIqw" width="640" height="480"></iframe>
+    <input type="file" id="f">
+<textarea id="output" rows="20" cols="70"></textarea>
+<script>
+    let getDom = xml => (new DOMParser()).parseFromString(xml, "text/xml")
+    let getExtension = fileName => fileName.split(".").pop()
+
+    let getKmlDom = (kmzFile) => {
+        var zip = new JSZip()
+        return zip.loadAsync(kmzFile)
+            .then(zip => {
+                let kmlDom = null
+                zip.forEach((relPath, file) => {
+                    if (getExtension(relPath) === "kml" && kmlDom === null) {
+                        kmlDom = file.async("string").then(getDom)
+                    }
+                })
+                return kmlDom || Promise.reject("No kml file found")
+            });
+    }
+    var f = document.getElementById("f")
+    f.addEventListener("change", e => {
+        let geoJson = getKmlDom(e.target.files[0]).then(kmlDom => {
+            let geoJsonObject = toGeoJSON.kml(kmlDom)
+            return JSON.stringify(geoJsonObject)
+        })
+        geoJson.then(gj => document.getElementById("output").innerText = gj)
+    })
+</script>
+</body>
+</html>
