@@ -10,10 +10,17 @@
     "type": "git",
     "url": "git+https://github.com/albertrein/google-maps-kmz-convert-geoJson.git"
   },
+  "dependencies": {
+    "jszip": "^3.3.0",
+    "express": "^4.17.1"
+  },
   "author": "albertrein",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/albertrein/google-maps-kmz-convert-geoJson/issues"
   },
-  "homepage": "https://github.com/albertrein/google-maps-kmz-convert-geoJson#readme"
+  "homepage": "https://github.com/albertrein/google-maps-kmz-convert-geoJson#readme",
+  "devDependencies": {
+    "express": "^4.17.1"
+  }
 }
