@@ -18,10 +18,15 @@ const http = require('https');
         fs.readFile("mapa.kmz",'',(err, data) => {
             let x = jszip2.loadAsync(data).then(async zip => {
                 zip.forEach(async (relPath, file) => {
-                    let xml = await file.async("string").then(getDom)
+                    let xml = await file.async("string").then(xmlString => {
+                        let jsonString = parser.toJson(xmlString);
+                        let jsonObject = JSON.parse(jsonString)
+                        console.log(jsonObject.kml.Document.Folder.name)
+
+                    })
                     //console.log(xml)
-                    let json = parser.toJson(xml);
-                    console.log(typeof(json))
+                    //let json = parser.toJson(xml);
+                    //console.log(typeof(json))
                     //fs.writeFile('jsonGravatai.json',json);
                 })
             })
