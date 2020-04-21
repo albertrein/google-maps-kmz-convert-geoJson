@@ -8,6 +8,7 @@ module.exports.load = async mid => {
     let timestamp = Date.now();
     await loadFile(timestamp, mid);
     let jsonObject  = await readData(timestamp);
+    deleteFile(timestamp);
     return(jsonObject);
 } 
 
@@ -23,22 +24,24 @@ loadFile = (fileName, mid) => new Promise((resolve, reject) => {
 
 readData = (fileName) => new Promise((resolve, reject) => {
     fs.readFile(fileName+".kmz",'',(err, data) => {
+        if(err){
+            reject(err);
+        }
         jszip1.loadAsync(data).then(async zip => {
             zip.forEach(async (relPath, file) => {
                 file.async("string").then(xmlString => {
                     let jsonString = parser.toJson(xmlString);
                     let jsonObject = JSON.parse(jsonString)
                     //console.log(jsonObject);
-                    resolve(jsonObject.kml.Document.Folder)    
+                    resolve(jsonObject.kml)    
                 })
             })
         })
     });
 })
 
-/**
- * To do
- * delete data
- * verifications
- */
-//deleteData (timestamp) => {}
+deleteFile = (timestamp) => {
+    fs.unlink(timestamp+".kmz", () => {
+        return true;
+    })
+}
