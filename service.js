@@ -1,49 +1,44 @@
-const JsZip = require('jszip');
-const domparser = require('dom-parser');
-const dom = new domparser();
 const fs = require('fs');
+const jszip1 = require('jszip');
+//const jszip2 = require('./jszip2');
+const parser = require('xml2json');
 const http = require('https');
-const fetch = require('fetch');
 
-module.exports = async (mid) => {
+module.exports.load = async mid => {
     let timestamp = Date.now();
-    let exit = await saveFileKMZ(mid, timestamp);
-    //readFileKMZ(timestamp);
-}
+    await loadFile(timestamp, mid);
+    let jsonObject  = await readData(timestamp);
+    return(jsonObject);
+} 
 
-saveFileKMZ = (mid,timestamp) => new Promise((resolve,reject) => {
-    fetch.FetchStream('https://www.google.com/maps/d/kml?mid='+mid).then(res => res.buffer).then(buffer => {console.log('asd')})
-});
-
-readFileKMZ = (timestamp) => new Promise(async (resolve,reject) => {
-    
-    
-    fs.readFile(timestamp+".kmz", function(err, data) {
-        if (err) throw err;
-        JsZip.loadAsync(data).then(function (zip) {
-            console.log('massa')
+loadFile = (fileName, mid) => new Promise((resolve, reject) => {
+    const file = fs.createWriteStream(fileName+".kmz");
+    http.get("https://www.google.com/maps/d/kml?mid="+mid, response => {
+        let streamFile = response.pipe(file)
+        streamFile.on('finish', function() {
+            resolve()
         });
     });
 });
 
-let getDom = xml => (new DOMParser()).parseFromString(xml, "text/xml")
-let getExtension = fileName => fileName.split(".").pop()
-
-getKmlDom = async (fileReaded) => {
-    let jszip = new JsZip();
-    return jszip.get  .loadAsync(fileReaded).then(zip => {
-        zip.forEach((relPath, fileReaded) => {
-            if (getExtension(relPath) === "kml" && kmlDom === null) {
-                kmlDom = fileReaded.async("string").then(getDom)
-            }
+readData = (fileName) => new Promise((resolve, reject) => {
+    fs.readFile(fileName+".kmz",'',(err, data) => {
+        jszip1.loadAsync(data).then(async zip => {
+            zip.forEach(async (relPath, file) => {
+                file.async("string").then(xmlString => {
+                    let jsonString = parser.toJson(xmlString);
+                    let jsonObject = JSON.parse(jsonString)
+                    //console.log(jsonObject);
+                    resolve(jsonObject.kml.Document.Folder)    
+                })
+            })
         })
-        return kmlDom || Promise.reject("No kml file found") 
     });
-    
-}
+})
 
-deleteTempFile = (timestamp) => new Promise((resolve,reject) => {
-    fs.unlink(timestamp+".kmz",()=>{
-        resolve();
-    });
-});
+/**
+ * To do
+ * delete data
+ * verifications
+ */
+//deleteData (timestamp) => {}
