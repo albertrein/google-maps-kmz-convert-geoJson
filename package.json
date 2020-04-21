@@ -1,7 +1,7 @@
 {
   "name": "api-google-maps-convert-kmz-json",
   "version": "1.0.0",
-  "description": "Api google maps to convert kmz files to geoJson by mid.",
+  "description": "Api google maps to convert kmz files to geoJson by mapId.",
   "main": "server.js",
   "scripts": {
     "dev": "nodemon server.js",
@@ -12,7 +12,6 @@
     "url": "git+https://github.com/albertrein/google-maps-kmz-convert-geoJson.git"
   },
   "dependencies": {
-    "dom-parser": "^0.1.6",
     "express": "^4.17.1",
     "geojson": "^0.5.0",
     "jszip": "^3.3.0",
